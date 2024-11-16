@@ -1,0 +1,12 @@
+{
+    "name": "devdavehq/unimart",
+    "type": "library",
+    "autoload": {
+        "classmap": [
+            "core/"
+        ]
+    },
+    "require": {
+        "mongodb/mongodb": "*"
+    }
+}

@@ -1,40 +1,36 @@
 <?php
    
  //Include the Router logic
- include_once './phpLogicPack/router.php';
+ require 'vendor/autoload.php';
 
- Router::get("/", function ($allParams, $pathParams, $requestData) {
-    echo "All params (including query): ";
-    print_r($allParams);
-    echo "Path params: ";
-    print_r($pathParams);
-    echo "Request data (GET): ";
-    print_r($requestData);
-});
+    Router::get("/", function ($allParams, $requestData, $status) {
+        echo "All params (including query): ";
+        print_r($allParams);
+        
+        echo "Request data (GET): ";
+        print_r($requestData);
+    });
 
-// Router::post("/users", function ($allParams, $pathParams, $requestData) {
-//     echo "All params (including query): ";
-//     print_r($allParams);
-//     echo "Path params: ";
-//     print_r($pathParams);
-//     echo "Request data (POST): ";
-//     print_r($requestData);
-// });
+    Router::post("/users", function ($allParams, $requestData, $status) {
+        echo "All params (including query): ";
+        print_r($allParams);
+   
+        echo "Request data (POST): ";
+        print_r($requestData);
+    });
 
-    Router::get("/users/{id}", function ($fullParams, $query, $queryData) {
+    Router::get("/users/{id}", function ($fullParams, $queryData, $status) {
         echo "All params (including query): ";
         print_r($fullParams);
-        echo "Path params: ";
-        print_r($query);
+     
         echo "Request data (GET): ";
         print_r($queryData);
     });
 
-    Router::get("/user/{id}", function ($allParams, $pathParams, $requestData) {
+    Router::get("/user/{id?}", function ($allParams, $requestData, $status) {
         echo "All params (including query): ";
         print_r($allParams);
-        echo "Path params: ";
-        print_r($pathParams);
+       
         echo "Request data (GET): ";
         print_r($requestData);
     });
@@ -42,9 +38,9 @@
 Router::handleRequest();
 
 
-ob_end_flush();
- ?>
 
+ ?>
+ 
 
     <!-- <script>
 

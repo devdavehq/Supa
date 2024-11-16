@@ -1,14 +1,21 @@
 const gulp = require('gulp');
 const browserSync = require('browser-sync').create();
 
-// Static Server + watching files
-gulp.task('serve', function() {
-  browserSync.init({
-    proxy: 'http://localhost:2088', // Your PHP server
-    port: 3000
-  });
+gulp.task('serve', () => {
+    browserSync.init({
+        proxy: "http://localhost:2088",
+        port: 3000,
+        reloadOnRestart: true,
+        cache: false,
+        notify: true,
+        open: true
+    });
 
-  gulp.watch('**/*.php').on('change', browserSync.reload);
+    gulp.watch(["**/*.php"]).on("change", (path) => {
+      console.log(`File changed: ${path}`);
+      browserSync.reload();
+  });
+  
 });
 
 gulp.task('default', gulp.series('serve'));

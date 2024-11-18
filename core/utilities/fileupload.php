@@ -8,6 +8,8 @@
  * @return array Result of the upload operation
  */
 function fileUpload($files, array $options = []) {
+    
+    try{
     // Default options
     $defaultOptions = [
         'destination' => 'uploads/', // Default upload directory
@@ -20,7 +22,7 @@ function fileUpload($files, array $options = []) {
 
     ];
 
-    
+    if($files['tmp_name'] !== null){
     // Merge provided options with defaults
     $options = array_merge($defaultOptions, $options);
 
@@ -106,9 +108,18 @@ function fileUpload($files, array $options = []) {
     }
 
     // Set success flag if any files were uploaded successfully
-    $result['success'] = !empty($result['files']);
+        $result['success'] = !empty($result['files']);
 
-    return $result;
+        return $result;
+    }else {
+        throw new Exception("Invalid data passed or file is empty", 1);
+         ;
+    
+    }
+    }catch(Exception $e){
+        return $e->getMessage();
+    }
+    
 }
 
 

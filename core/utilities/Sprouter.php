@@ -1,12 +1,16 @@
 <?php
 
-class Router {
+class Sprouter {
     private $routes = []; // Store all routes
 
     /**
      * Add a route to the router
+     * 
      */
-    public function addRoute($uri, $viewFile) {
+    public function __construct(){
+        return;
+    }
+    public function route($uri, $viewFile) {
         $this->routes[$uri] = $viewFile;
     }
 

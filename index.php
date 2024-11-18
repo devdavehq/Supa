@@ -2,6 +2,23 @@
    
  //Include the Router logic
  require 'vendor/autoload.php';
+require_once 'core/_index.php';
+
+
+//  $html = new CreateHtml();
+
+//  $html->head("My Page")
+//       ->meta(['charset' => 'UTF-8', 'name' => 'viewport', 'content' => 'width=device-width, initial-scale=1.0'])
+//       ->body(['class' => 'main-body'])
+//       ->tag('h1', ['Welcome'])
+//       ->tag('p', ['This is a paragraph.'])
+//       ->form(['action' => '/submit', 'method' => 'POST'])
+//       ->customhtml('<input type="text" name="username">')
+//       ->customhtml('<button type="submit">Submit</button>')
+//       ->html();
+ 
+
+        
 
     Router::get("/", function ($allParams, $requestData, $status) {
         echo "All params (including query): ";
@@ -9,6 +26,17 @@
         
         echo "Request data (GET): ";
         print_r($requestData);
+
+        // print_r(fileUpload($_FILES));
+        // print_r($_FILES);
+        $ins = new Sprouter();
+        $ins->route('/', 'pg.php');
+        $ins->render();
+        // render('name', ['name'=> 'David']);
+        $ins = new CSRFProtection();
+        echo $ins->getToken();
+        
+        
     });
 
     Router::post("/users", function ($allParams, $requestData, $status) {

@@ -117,7 +117,40 @@ class CreateSchema extends Pdoconn {
             echo "Error creating table: " . $e->getMessage() . "\n";
         }
     }
+
+    public function updateTable($tableName, $columnName, $newDefinition) {
+        // Validate table name and column name
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $tableName) || !preg_match('/^[a-zA-Z0-9_]+$/', $columnName)) {
+            throw new InvalidArgumentException("Invalid table or column name.");
+        }
+
+        try {
+            // Generate the ALTER TABLE query for column modification
+            $alterSQL = "ALTER TABLE $tableName CHANGE $columnName $columnName " . $newDefinition['type'] . ' ' . implode(' ', $newDefinition['attributes']);
+            $this->pdo->exec($alterSQL); // Use PDO connection for altering the table
+            echo "Column $columnName in table $tableName updated successfully.\n";
+        } catch (Exception $e) {
+            echo "Error updating column: " . $e->getMessage() . "\n";
+        }
+    }
+
+    public function deleteColumn($tableName, $columnName) {
+        // Validate table name and column name
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $tableName) || !preg_match('/^[a-zA-Z0-9_]+$/', $columnName)) {
+            throw new InvalidArgumentException("Invalid table or column name.");
+        }
+
+        try {
+            // Generate the DROP COLUMN query
+            $dropSQL = "ALTER TABLE $tableName DROP COLUMN $columnName";
+            $this->pdo->exec($dropSQL); // Use PDO connection for dropping the column
+            echo "Column $columnName in table $tableName deleted successfully.\n";
+        } catch (Exception $e) {
+            echo "Error deleting column: " . $e->getMessage() . "\n";
+        }
+    }
 }
+
 
 // HOW TO USE
 // Include the necessary class files
@@ -157,3 +190,13 @@ class CreateSchema extends Pdoconn {
 
 // // Create a new table in the newly created database
 // $schemaCreator->createTable($tableName, $columns);
+
+// Update a column's definition (e.g., change the column type)
+// $newColumnDefinition = [
+//     'type' => 'VARCHAR(200)',
+//     'attributes' => ['NOT NULL', 'UNIQUE']
+// ];
+// $schemaCreator->updateTable('users', 'email', $newColumnDefinition);
+
+// // Delete a column (e.g., remove the 'name' column)
+// $schemaCreator->deleteColumn('users', 'name');

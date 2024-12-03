@@ -11,5 +11,7 @@
     require 'utilities/Formhandler.php';
     require 'utilities/render.php';
     require 'utilities/sanitizer.php';
+    require 'autoReload/watcher.php';
+
 
 

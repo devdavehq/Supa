@@ -1,7 +1,7 @@
 # Supa
 
 ## Description
-Supa is a PHP supercharger inspired by Laravel and Node.js. It enhances PHP's functionality, making it more efficient to use. Key features include:
+Supa is a PHP supercharger inspired by Laravel and Node.js. It enhances PHP's functionality, making it more efficient to use without altering the basic PHP syntax. The purpose of Supa is to simplify the writing of PHP and address common challenges developers face, all while maintaining the familiar PHP syntax. Key features include:
 
 - Routing similar to Laravel
 - Middleware handling
@@ -13,7 +13,7 @@ Supa is a PHP supercharger inspired by Laravel and Node.js. It enhances PHP's fu
 - Database migration supporting both MySQL and NoSQL
 - Multiple ways to handle SQL, both functional and method chaining
 - Data sanitizers
-- Dynamic rendering similar to EJS's `app.render` method
+- Dynamic rendering similar to Express `app.render` method
 - An `_index.php` file for adding all required files
 - Flexible and dynamic reloading for real-time changes, especially for HTML files with a .php extension
 

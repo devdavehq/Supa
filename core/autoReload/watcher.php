@@ -1,7 +1,35 @@
 <?php
 // watcher.php
 
-$filesToWatch = ['index.php', 'reload.js']; // List of files to monitor for changes
+$directoriesToWatch = [
+    'core/includes/', // First directory to watch
+    'core/anotherDirectory/', // Second directory to watch
+    // Add more directories as needed
+];
+
+$filesToWatch = []; // Initialize the array to store files to watch
+
+// Function to recursively get all PHP files in a directory and its subdirectories
+function getPhpFiles($directory) {
+    $files = glob($directory . '*.php'); // Get all PHP files in the current directory
+    $subdirectories = glob($directory . '*', GLOB_ONLYDIR); // Get all subdirectories
+
+    foreach ($subdirectories as $subdirectory) {
+        $files = array_merge($files, getPhpFiles($subdirectory . '/')); // Recursively get PHP files from subdirectories
+    }
+
+    return $files; // Return the array of PHP files
+}
+
+// Gather all PHP files from the specified directories
+foreach ($directoriesToWatch as $directory) {
+    $filesToWatch = array_merge($filesToWatch, getPhpFiles($directory)); // Merge files from each directory
+}
+
+// Add other specific files if needed
+$filesToWatch[] = 'index.php';
+$filesToWatch[] = 'reload.js';
+
 $lastModifiedTimes = []; // Array to store the last modified times of the files
 
 // Initialize last modified times
@@ -10,7 +38,7 @@ foreach ($filesToWatch as $file) {
 }
 
 // Start WebSocket server
-$server = new Ratchet\App('localhost', 2088); // Create a new WebSocket server on localhost:8080
+$server = new Ratchet\App('localhost', 2088); // Create a new WebSocket server on localhost:2088
 $server->route('/reload', new class implements \Ratchet\MessageComponentInterface {
     protected $clients; // Store connected clients
 

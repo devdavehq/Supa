@@ -1,4 +1,8 @@
 <?php
+
+require dirname(__DIR__, 2).'/vendor/autoload.php'; // Adjust the path if necessary
+
+
 // watcher.php
 
 // $directoriesToWatch = [
@@ -28,7 +32,7 @@ $filesToWatch = []; // Initialize the array to store files to watch
 
 // Add other specific files if needed
 $filesToWatch[] = 'index.php';
-$filesToWatch[] = 'reload.js';
+$filesToWatch[] = __DIR__ . '/reload.js';
 
 $lastModifiedTimes = []; // Array to store the last modified times of the files
 
@@ -72,6 +76,10 @@ $server->route('/reload', new class implements \Ratchet\MessageComponentInterfac
 // Watch for file changes
 while (true) {
     foreach ($filesToWatch as $file) {
+        if (!file_exists($file)) {
+            echo "File does not exist: $file\n"; // Debugging output
+            continue; // Skip to the next file
+        }
         clearstatcache(); // Clear the file status cache
         $currentModifiedTime = filemtime($file); // Get the current modified time of the file
         if ($currentModifiedTime !== $lastModifiedTimes[$file]) { // Check if the file has been modified

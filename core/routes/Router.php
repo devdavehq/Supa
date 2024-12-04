@@ -13,84 +13,58 @@ class Router
     // Method to register global middleware
     public static function use($middleware)
     {
-        $method = $_SERVER['REQUEST_METHOD'];
         self::$globalMiddleware[] = $middleware; // Add middleware to the global array
-        // Prepare parameters to pass to the middleware
-        $rawInput = file_get_contents("php://input"); // Read raw input for PUT and DELETE
-        $parsedInput = [];
+    }
 
-        // Parse the input if it's not empty
-        if (!empty($rawInput)) {
-            parse_str($rawInput, $parsedInput); // Parse the raw input into an associative array
-        }
-
-        // Prepare parameters for middleware
-        $params = [
-            'method' => $method, // Pass the request method
-            'GET' => $_GET ?? [], // Use null coalescing to provide an empty array if not set
-            'POST' => $_POST ?? [], // Same for POST
-            'PUT' => $parsedInput, // Use parsed input for PUT
-            'DELETE' => $parsedInput // Use parsed input for DELETE
+    public static function group($prefix, $middleware = null)
+    {
+        // Push the current group attributes onto the stack
+        self::$groupStack[] = [
+            'prefix' => rtrim($prefix, '/'),
+            'middleware' => self::resolveMiddleware($middleware)
         ];
-
-        // Execute global middleware before handling routes
-        foreach (self::$globalMiddleware as $middleware) {
-            try {
-                $middlewareResult = $middleware($params); // Call global middleware with superglobal params
-                if ($middlewareResult === false) {
-                    // Handle the failure case immediately
-                    echo Router::sendResponse(401, 'Unauthorized'); // Example response
-                    return; // Stop further execution
-                }
-            } catch (Exception $e) {
-                // Handle the exception
-                echo Router::sendResponse(500, $e->getMessage()); // Send error response
-                return; // Stop further execution
+        return new class {
+            public function get($url, $handler, $middleware = null)
+            {
+                return Router::addRoute('GET', $url, $handler, $middleware);
             }
-        }
+
+            public function post($url, $handler, $middleware = null)
+            {
+                return Router::addRoute('POST', $url, $handler, $middleware);
+            }
+
+            public function put($url, $handler, $middleware = null)
+            {
+                return Router::addRoute('PUT', $url, $handler, $middleware);
+            }
+
+            public function delete($url, $handler, $middleware = null)
+            {
+                return Router::addRoute('DELETE', $url, $handler, $middleware);
+            }
+        };
     }
 
     public static function addRoute($method, $url, $handler, $middlewareOrName = null)
     {
         $groupAttributes = self::getGroupAttributes();
         $url = $groupAttributes['prefix'] . $url;
-        
+
         // Initialize variables
         $middleware = [];
         $routeName = null;
 
-        // determine if its a middleware or route name
+        // Determine if it's a middleware or route name
         if ($middlewareOrName !== null) {
             if (is_string($middlewareOrName)) {
-                // Check if it's a middleware class or string
-                if (class_exists($middlewareOrName, false)) { // Don't autoload
-                    // Optionally validate the class has required method
-                    if (!method_exists($middlewareOrName, '__invoke') && 
-                        !method_exists($middlewareOrName, 'handle')) {
-                        throw new Exception("Invalid middleware class: missing required method");
-                    }
-                    $middleware = [$middlewareOrName];
-                } elseif (is_callable($middlewareOrName)) {
-                    $middleware = [$middlewareOrName];
-                } else {
-                    // Validate route name
-                    if (isset(self::$namedRoutes[$middlewareOrName])) {
-                        throw new Exception("Route name '{$middlewareOrName}' already exists");
-                    }
-                    $routeName = $middlewareOrName;
+                // Validate route name
+                if (isset(self::$namedRoutes[$middlewareOrName])) {
+                    throw new Exception("Route name '{$middlewareOrName}' already exists");
                 }
-            } elseif (is_callable($middlewareOrName)) {
-                // Handle direct callable (closure/function)
-                $middleware = [$middlewareOrName];
-            } elseif (is_array($middlewareOrName)) {
-                // Validate each middleware in array
-                foreach ($middlewareOrName as $m) {
-                    if (!is_callable($m) && 
-                        !(is_string($m) && class_exists($m, false))) {
-                        throw new Exception("Invalid middleware in array");
-                    }
-                }
-                $middleware = $middlewareOrName;
+                $routeName = $middlewareOrName;
+            } elseif (is_callable($middlewareOrName) || is_array($middlewareOrName)) {
+                $middleware = (array) $middlewareOrName; // Ensure it's an array
             }
         }
 
@@ -222,13 +196,6 @@ class Router
        
     }
 
-    public static function group($attributes, $callback)
-    {
-        self::$groupStack[] = $attributes;
-        call_user_func($callback);
-        array_pop(self::$groupStack);
-    }
-
     private static function getGroupAttributes()
     {
         $prefix = '';
@@ -288,12 +255,6 @@ include_once 'Namedroute.php';
 // // Define middleware group
 // Router::middlewareGroup('api', ['throttle', 'json']);
 
-// // Use route group with middleware group
-// Router::group(['prefix' => '/api', 'middleware' => 'api'], function() {
-//     // Define named routes within the group
-//     Router::get('/users', $userListHandler)->name('users.list');
-//     Router::get('/users/{id}', $userDetailHandler)->name('users.detail');
-// });
 
 // // Define fallback route
 // Router::fallback(function() {
@@ -319,32 +280,18 @@ include_once 'Namedroute.php';
 // }
 
 // // Group routing with middleware
-// Router::group(['prefix' => 'api', 'middleware' => logMiddleware], function() {
-    
-//     Router::group(['prefix' => 'users', 'middleware' => authMiddleware], function() {
-        
-//         // This route will have URL /api/users/{id} and both logMiddleware and authMiddleware
-//         Router::get('/{id}', function($params, $matches) {
-//             echo "User details for ID: " . $matches['id'];
-//         }, 'user.details');
-
-//         // This route will have URL /api/users/{id?} with an optional ID
-//         Router::get('/{id?}', function($params, $matches) {
-//             if (isset($matches['id'])) {
-//                 echo "User details for ID: " . $matches['id'];
-//             } else {
-//                 echo "List of all users";
-//             }
-//         }, 'user.list');
-
+// Router::group('api/', 'authMiddleware')
+//     ->get('/user', function($params) {
+//         // Handle GET request for user
+//         echo "User details";
+//     }, ['logMiddleware']) // You can also add additional middleware here
+//     ->post('/user', function($params) {
+//         // Handle POST request for user
+//         echo "User created";
 //     });
+//    
 
-//     // This route will have URL /api/public and only logMiddleware
-//     Router::get('/public', function($params, $matches) {
-//         echo "Public API";
-//     }, 'public.api');
 
-// });
 // Route with middleware
 // Router::get('/private', function($params, $matches) {
 //     echo "This is a private route";
@@ -354,29 +301,32 @@ include_once 'Namedroute.php';
 //     echo "This is a private route";
 // }, function(params){});
 
-// // Using named routes
-// echo Router::url('user.details', ['id' => 5]); // Outputs: /api/users/5
-// echo Router::url('user.list'); // Outputs: /api/users
-// echo Router::url('public.api'); // Outputs: /api/public
+
 
 // // Handle the request
 // Router::handleRequest();
 // extract($data);
 
+
+
 // Router::defineGroup('users', ['middleware' => 'authMiddleware'], function() {
     
-//     // This route will have URL /api/users/{id} and both logMiddleware and authMiddleware
-//     Router::addRoute('GET', '/{id}', function($params, $matches) {
-//         echo "User details for ID: " . $matches['id'];
-//     }, 'user.details');
+//      // Define a GET route for /user
+    Router::get('/user', function($params) {
+        echo "User details";
+    })
+    ->middleware(['logMiddleware', 'anotherMiddleware']); // Adding multiple middleware
 
-//     // This route will have URL /api/users/{id?} with an optional ID
-//     Router::addRoute('GET', '/{id?}', function($params, $matches) {
-//         if (isset($matches['id'])) {
-//             echo "User details for ID: " . $matches['id'];
-//         } else {
-//             echo "List of all users";
-//         }
-//     }, 'user.list');
+    // Define a POST route for /user
+    Router::post('/user', function($params) {
+        echo "User created";
+    })
+    ->middleware('logMiddleware'); // Adding a single middleware
+
+    // Define a public route
+    Router::get('/public', function($params) {
+        echo "Public API";
+    })
+    ->middleware(['logMiddleware']); // Adding middleware for this route as well
 
 // });

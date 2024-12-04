@@ -19,9 +19,9 @@ class Route extends Router {
         return $this; // Return $this for chaining
     }
 
-    public function name($name) {
-        // Set the route name
-        self::$namedRoutes[$name] = $this->routeId;
-        return $this; // Return $this for chaining
-    }
+    // public function name($name) {
+    //     // Set the route name
+    //     self::$namedRoutes[$name] = $this->routeId;
+    //     return $this; // Return $this for chaining
+    // }
 }

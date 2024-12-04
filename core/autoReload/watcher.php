@@ -1,30 +1,30 @@
 <?php
 // watcher.php
 
-$directoriesToWatch = [
-    'core/includes/', // First directory to watch
-    'core/anotherDirectory/', // Second directory to watch
-    // Add more directories as needed
-];
+// $directoriesToWatch = [
+//     'core/includes/', // First directory to watch
+//     'core/anotherDirectory/', // Second directory to watch
+//     // Add more directories as needed
+// ];
 
 $filesToWatch = []; // Initialize the array to store files to watch
 
 // Function to recursively get all PHP files in a directory and its subdirectories
-function getPhpFiles($directory) {
-    $files = glob($directory . '*.php'); // Get all PHP files in the current directory
-    $subdirectories = glob($directory . '*', GLOB_ONLYDIR); // Get all subdirectories
+// function getPhpFiles($directory) {
+//     $files = glob($directory . '*.php'); // Get all PHP files in the current directory
+//     $subdirectories = glob($directory . '*', GLOB_ONLYDIR); // Get all subdirectories
 
-    foreach ($subdirectories as $subdirectory) {
-        $files = array_merge($files, getPhpFiles($subdirectory . '/')); // Recursively get PHP files from subdirectories
-    }
+//     foreach ($subdirectories as $subdirectory) {
+//         $files = array_merge($files, getPhpFiles($subdirectory . '/')); // Recursively get PHP files from subdirectories
+//     }
 
-    return $files; // Return the array of PHP files
-}
+//     return $files; // Return the array of PHP files
+// }
 
 // Gather all PHP files from the specified directories
-foreach ($directoriesToWatch as $directory) {
-    $filesToWatch = array_merge($filesToWatch, getPhpFiles($directory)); // Merge files from each directory
-}
+// foreach ($directoriesToWatch as $directory) {
+//     $filesToWatch = array_merge($filesToWatch, getPhpFiles($directory)); // Merge files from each directory
+// }
 
 // Add other specific files if needed
 $filesToWatch[] = 'index.php';

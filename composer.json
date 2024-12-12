@@ -1,14 +1,23 @@
 {
     "name": "devdavehq/supa",
     "type": "library",
+    "license": "MIT",
     "autoload": {
         "classmap": [
             "core/"
         ]
     },
+    "authors": [
+        {
+            "name": "David"
+        }
+    ],
     "require": {
-        "mongodb/mongodb": "*",
+        "mongodb/mongodb": "^1.0",
         "phpmailer/phpmailer": "^6.9",
-        "cboden/ratchet": "^0.4.4"
+        "cboden/ratchet": "^0.4.4",
+        "react/event-loop": "^1.0",
+        "react/http": "^1.0",
+        "react/socket": "^1.0"
     }
 }

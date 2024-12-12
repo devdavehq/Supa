@@ -112,8 +112,7 @@ function fileUpload($files, array $options = []) {
 
         return $result;
     }else {
-        throw new Exception("Invalid data passed or file is empty", 1);
-         ;
+        throw new Exception("Invalid data passed or file is empty", 1); 
     
     }
     }catch(Exception $e){

@@ -1,5 +1,8 @@
 <?php 
 
+
+require dirname(__DIR__, 3).'/vendor/autoload.php'; // Include Composer's autoload file
+
 class MongoDBConnection {
     private $connection;
     public $db; // Changed visibility to public for direct access

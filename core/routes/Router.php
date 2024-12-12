@@ -312,21 +312,21 @@ include_once 'Namedroute.php';
 // Router::defineGroup('users', ['middleware' => 'authMiddleware'], function() {
     
 //      // Define a GET route for /user
-    Router::get('/user', function($params) {
-        echo "User details";
-    })
-    ->middleware(['logMiddleware', 'anotherMiddleware']); // Adding multiple middleware
+    // Router::get('/user', function($params) {
+    //     echo "User details";
+    // })
+    // ->middleware(['logMiddleware', 'anotherMiddleware']); // Adding multiple middleware
 
-    // Define a POST route for /user
-    Router::post('/user', function($params) {
-        echo "User created";
-    })
-    ->middleware('logMiddleware'); // Adding a single middleware
+    // // Define a POST route for /user
+    // Router::post('/user', function($params) {
+    //     echo "User created";
+    // })
+    // ->middleware('logMiddleware'); // Adding a single middleware
 
-    // Define a public route
-    Router::get('/public', function($params) {
-        echo "Public API";
-    })
-    ->middleware(['logMiddleware']); // Adding middleware for this route as well
+    // // Define a public route
+    // Router::get('/public', function($params) {
+    //     echo "Public API";
+    // })
+    // ->middleware(['logMiddleware']); // Adding middleware for this route as well
 
 // });

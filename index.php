@@ -2,20 +2,13 @@
    
  //Include the Router logic
  require 'vendor/autoload.php';
-require_once 'core/_index.php';
+ require 'core/_index.php';
+//  use Core\Router;
+// echo "Starting request handling...\n";
 
-
-//  $html = new CreateHtml();
-
-//  $html->head("My Page")
-//       ->meta(['charset' => 'UTF-8', 'name' => 'viewport', 'content' => 'width=device-width, initial-scale=1.0'])
-//       ->body(['class' => 'main-body'])
-//       ->tag('h1', ['Welcome'])
-//       ->tag('p', ['This is a paragraph.'])
-//       ->form(['action' => '/submit', 'method' => 'POST'])
-//       ->customhtml('<input type="text" name="username">')
-//       ->customhtml('<button type="submit">Submit</button>')
-//       ->html();
+// use React\Http\HttpServer;
+// use React\Http\Message\Response;
+// use React\EventLoop\Factory;
  
 
         
@@ -29,12 +22,30 @@ require_once 'core/_index.php';
 
         // print_r(fileUpload($_FILES));
         // print_r($_FILES);
-        $ins = new Sprouter();
-        $ins->route('/', 'pg.php');
-        $ins->render();
-        // render('name', ['name'=> 'David']);
-        $ins = new CSRFProtection();
-        echo $ins->getToken();
+        // $ins = new Sprouter();
+        // $ins->route('/', 'pg.php');
+        // $ins->render();
+        // // render('name', ['name'=> 'David']);
+        // $ins = new CSRFProtection();
+        // echo $ins->getToken();
+       
+     
+        // $loop = Factory::create();
+     
+        // $server = new HttpServer(function ($request) {
+        //     return new Response(
+        //         200,
+        //         ['Content-Type' => 'text/plain'],
+        //         "Hello, World!"
+        //     );
+        // });
+     
+        // $socket = new React\Socket\Server('127.0.0.1:2088', $loop);
+        // $server->listen($socket);
+     
+        // echo "Server running at http://127.0.0.1:2088\n";
+     
+        // $loop->run();
         
         
     });
@@ -64,12 +75,61 @@ require_once 'core/_index.php';
     });
 
 Router::handleRequest();
+// $directoriesToWatch = [
+//     'core/includes/', // First directory to watch
+//     'core/anotherDirectory/', // Second directory to watch
+//     // Add more directories as needed
+// ];
 
+// $filesToWatch = []; // Initialize the array to store files to watch
+
+// Function to recursively get all PHP files in a directory and its subdirectories
+// function getPhpFiles($directory) {
+//     $files = glob($directory . '*.php'); // Get all PHP files in the current directory
+//     $subdirectories = glob($directory . '*', GLOB_ONLYDIR); // Get all subdirectories
+
+//     foreach ($subdirectories as $subdirectory) {
+//         $files = array_merge($files, getPhpFiles($subdirectory . '/')); // Recursively get PHP files from subdirectories
+//     }
+
+//     return $files; // Return the array of PHP files
+// }
+
+// Gather all PHP files from the specified directories
+// foreach ($directoriesToWatch as $directory) {
+//     $filesToWatch = array_merge($filesToWatch, getPhpFiles($directory)); // Merge files from each directory
+// }
+
+// Add other specific files if needed
+// $filesToWatch[] = dirname(__DIR__, 2).'/index.php';
+// $filesToWatch[] = __DIR__ . '/reload.js';
+
+// $lastModifiedTimes = []; // Array to store the last modified times of the files
+
+// // Initialize last modified times
+// foreach ($filesToWatch as $file) {
+//     $lastModifiedTimes[$file] = filemtime($file); // Get the last modified time of each file
+// }
 
 
  ?>
  
+ <!DOCTYPE html>
+   <html lang="en">
+   <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>Auto Reload Example</title>
+       <script src="core/autoReload/reload.js"></script> <!-- Include your reload.js script -->
+   </head>
+   <body>
+       <h1>Auto Reload Example</h1>
+       <p>Make changes to your PHP files and see the magic!</p>
+   </body>
+   </html>
 
+
+   jfjgjdfbkjb jdgeffwdfwyf
     <!-- <script>
 
 

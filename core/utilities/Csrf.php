@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 class CSRFProtection {
     public function __construct(){
         return;

@@ -31,6 +31,7 @@ To use Supa, refer to the documentation provided in the project. You can find ex
 
 ## Acknowledgments
 - **PHPMailer**: This project uses PHPMailer for email handling. [PHPMailer GitHub Repository](https://github.com/PHPMailer/PHPMailer)
+  **Firebase JWT**: This project uses the Firebase JWT library (https://github.com/firebase/php-jwt) for handling JSON Web Tokens.
 
 ## Contributing
 Supa is open source! Contributions are welcome. Please fork the repository and submit a pull request for any improvements or bug fixes.

@@ -18,6 +18,7 @@
         "cboden/ratchet": "^0.4.4",
         "react/event-loop": "^1.0",
         "react/http": "^1.0",
-        "react/socket": "^1.0"
+        "react/socket": "^1.0",
+        "firebase/php-jwt": "^6.10"
     }
 }

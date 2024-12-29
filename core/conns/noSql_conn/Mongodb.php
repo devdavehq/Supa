@@ -1,7 +1,7 @@
 <?php 
 
 
-require dirname(__DIR__, 3).'/vendor/autoload.php'; // Include Composer's autoload file
+require 'vendor/autoload.php'; // Include Composer's autoload file
 
 class MongoDBConnection {
     private $connection;

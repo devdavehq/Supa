@@ -5,6 +5,7 @@ class Route extends Router {
 
     public function __construct($routeId) {
         $this->routeId = $routeId;
+        
     }
 
     public function middleware($middleware) {

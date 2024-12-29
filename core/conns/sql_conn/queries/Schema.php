@@ -12,7 +12,7 @@ class CreateSchema extends Pdoconn {
         $this->mysqli = Dbconnsql::connectMysqli(); // Assuming MysqliConn is the class for MySQLi connection
     }
 
-    public function createDatabase($databaseName) {
+    public function createDatabase($databaseName, $dbtype = null) {
         // Validate database name
         if (!preg_match('/^[a-zA-Z0-9_]+$/', $databaseName)) {
             throw new InvalidArgumentException("Invalid database name.");
@@ -20,6 +20,9 @@ class CreateSchema extends Pdoconn {
 
         try {
             // Accessing dbType through a public method or changing its visibility
+
+            self::$dbType = $dbtype;
+
             switch (self::$dbType) { // Change to self:: if dbType is protected or public
                 case 'mysql':
                     // Check if the database exists
@@ -54,6 +57,7 @@ class CreateSchema extends Pdoconn {
                 default:
                     throw new Exception("Unsupported database type.");
             }
+       
             echo "Database $databaseName created successfully.\n";
         } catch (Exception $e) {
             echo "Error creating database: " . $e->getMessage() . "\n";

@@ -12,7 +12,7 @@ class Organizedmysqliquery {
     public function __construct($host, $user, $password, $database) {
         $this->conn = Dbconnsql::connectMySQLi();
     }
-
+    
     public function from($table) {
         $this->table = $table; // Set the table for the query
         return $this;

@@ -109,47 +109,6 @@ class Validator {
 
 //  normal usage
 
-// In your form processing
-// Validator::check($_POST)
-//     ->validate('username', [
-//         'required' => 'Username is required',
-//         'min:3' => 'Username too short'
-//     ])
-//     ->validate('email', [
-//         'required' => 'Email is required',
-//         'email' => 'Invalid email format'
-//     ])
-//     ->validate('password', [
-//         'required' => 'Password is required',
-//         'min:8' => 'Password too short'
-//     ])
-//     ->addRule('password', 
-//         fn($value) => preg_match('/[A-Z]/', $value),
-//         'Password needs an uppercase letter'
-//     );
-//     ->validate('username', ['required', 'alphanumeric'])
-//     ->addRule('username',
-//         function($value) {
-//             // Check if username exists in database
-//             $db = new Database();
-//             return !$db->exists('users', ['username' => $value]);
-//         },
-//         'Username already taken'
-//     );
-
-// // Check for errors
-// 
-//     echo "Form is valid!";
-// }<!-- register.php -->
-// <form method="POST" action="process.php">
-// <div>
-//     <label>Username:</label>
-//     <input type="text" name="username" 
-//            value="<?= htmlspecialchars($_SESSION['old']['username'] ?? '') ">
- //      if ($error = $validator->getFirstError('username')): 
-//         <div class="error">$error </div>
-
-//      endif -->
 
 
 

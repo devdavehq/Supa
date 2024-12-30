@@ -14,7 +14,7 @@ Supa is a PHP supercharger inspired by Laravel and Node.js. It enhances PHP's fu
 - Multiple ways to handle SQL, both functional and method chaining
 - Data sanitizers
 - Dynamic rendering similar to Express `app.render` method
-- An `_index.php` file for adding all required files
+- An `_index.php` file for adding all utilities files
 - Flexible and dynamic reloading for real-time changes, especially for HTML files with a .php extension
 
 ## Installation

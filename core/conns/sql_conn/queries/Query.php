@@ -2,11 +2,11 @@
 
 require 'vendor/autoload.php';
 
-class PdoQuery {
+class Query {
 
     // ... existing code ...
 
-    public static function execute($sql, $params = [], $types = "") {
+    public static function handler($sql, $params = [], $types = "") {
         // Get the database connection from Dbconn class
         $conn = Pdoconn::connectPDO(); // Change to PDO connection
 
@@ -94,3 +94,47 @@ class PdoQuery {
         }
     }
 } 
+
+
+
+//  Usage
+
+//  simple query
+// SELECT * FROM users WHERE email = ?
+
+// $email = 'user@example.com'; // Example email to search for
+// $sql = "SELECT * FROM users WHERE email = ?";
+// $params = [$email]; // Parameters to bind
+
+// $result = Pdoconn::handler($sql, $params, 's');
+
+// if ($result) {
+//     $user = $result->fetch(PDO::FETCH_ASSOC); // Fetch the user data
+//     print_r($user); // Output the user data
+// } else {
+//     echo "Error fetching user.";
+// }
+
+// // complex Query
+// SELECT users.username, posts.title, posts.content 
+// FROM users 
+// JOIN posts ON users.id = posts.user_id 
+// WHERE users.email = ? 
+// ORDER BY posts.created_at DESC
+
+// $email = 'user@example.com'; // Example email to search for
+// $sql = "SELECT users.username, posts.title, posts.content 
+//         FROM users 
+//         JOIN posts ON users.id = posts.user_id 
+//         WHERE users.email = ? 
+//         ORDER BY posts.created_at DESC";
+// $params = [$email]; // Parameters to bind
+
+// $result = Pdoconn::handler($sql, $params, 's');
+
+// if ($result) {
+//     $posts = $result->fetchAll(PDO::FETCH_ASSOC); // Fetch all posts for the user
+//     print_r($posts); // Output the posts
+// } else {
+//     echo "Error fetching posts.";
+// }

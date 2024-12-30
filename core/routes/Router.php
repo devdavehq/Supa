@@ -26,22 +26,26 @@ class Router
         return new class {
             public function get($url, $handler, $middleware = null)
             {
-                return Router::addRoute('GET', $url, $handler, $middleware);
+                 Router::addRoute('GET', $url, $handler, $middleware);
+                 return $this;
             }
 
             public function post($url, $handler, $middleware = null)
             {
-                return Router::addRoute('POST', $url, $handler, $middleware);
+                 Router::addRoute('POST', $url, $handler, $middleware);
+                 return $this;
             }
 
             public function put($url, $handler, $middleware = null)
             {
-                return Router::addRoute('PUT', $url, $handler, $middleware);
+                 Router::addRoute('PUT', $url, $handler, $middleware);
+                 return $this;
             }
 
             public function delete($url, $handler, $middleware = null)
             {
-                return Router::addRoute('DELETE', $url, $handler, $middleware);
+                 Router::addRoute('DELETE', $url, $handler, $middleware);
+                 return $this;
             }
         };
     }
@@ -92,55 +96,60 @@ class Router
         $method = $_SERVER['REQUEST_METHOD'];
         $path = $_SERVER['REQUEST_URI'];
 
-
+        // Initialize a flag to check if a route was matched
+        $routeMatched = false;
 
         foreach (self::$routes as $route) {
-            $matches = self::match($path, $route['url']);
-            if ($matches !== false && $route['method'] === $method) {
-                $queryParams = [];
-                $queryString = parse_url($path, PHP_URL_QUERY);
-                if ($queryString !== null) {
-                    parse_str($queryString, $queryParams);
-                }
-                $allParams = array_merge($matches, $queryParams);
-
-                // Execute route-specific middleware
-                foreach ($route['middleware'] as $middleware) {
-                    $middlewareResult = $middleware($allParams, $matches);
-                    if ($middlewareResult === false) {
-                        return; // Stop execution if middleware fails
+            // Check if the method matches and if the path matches
+            if ($route['method'] === $method) {
+                $matches = self::match($path, $route['url']);
+                if ($matches !== false) {
+                    $routeMatched = true; // Set the flag to true if a route is matched
+                    $queryParams = [];
+                    $queryString = parse_url($path, component: PHP_URL_QUERY);
+                    if ($queryString !== null) {
+                        parse_str($queryString, $queryParams);
                     }
-                }
+                    $allParams = array_merge($matches, $queryParams);
 
-                // Execute the main handler
-                switch ($method) {
-                    case 'POST':
-                        $requestData = $_POST;
-                        break;
-                    case 'GET':
-                        $requestData = $_GET;
-                        break;
-                    case 'PUT':
-                    case 'DELETE':
-                        $input = file_get_contents("php://input");
-                        if (!empty($input)) {
-                            parse_str($input, $requestData);
-                        } else {
-                            $requestData = [];
+                    // Execute route-specific middleware
+                    foreach ($route['middleware'] as $middleware) {
+                        $middlewareResult = $middleware($allParams, $matches);
+                        if ($middlewareResult === false) {
+                            return; // Stop execution if middleware fails
                         }
-                        break;
-                    default:
-                        $requestData = [];
-                }
+                    }
 
-                $requestData = array_merge($requestData, $_FILES);
-               
-                $response = $route['handler']($allParams, $requestData, self::sendResponse(200, 'ok'));
-                
-                return;
+                    // Execute the main handler
+                    switch ($method) {
+                        case 'POST':
+                            $requestData = $_POST;
+                            break;
+                        case 'GET':
+                            $requestData = $_GET;
+                            break;
+                        case 'PUT':
+                        case 'DELETE':
+                            $input = file_get_contents("php://input");
+                            if (!empty($input)) {
+                                parse_str($input, $requestData);
+                            } else {
+                                $requestData = [];
+                            }
+                            break;
+                        default:
+                            $requestData = [];
+                    }
+
+                    $requestData = array_merge($requestData, $_FILES);
+                    $response = $route['handler']($allParams, $requestData, self::sendResponse(200, 'ok'));
+                    
+                    return; // Exit after handling the matched route
+                }
             }
         }
 
+        // If no route matched, handle fallback
         if (self::$fallbackHandler) {
             $response = call_user_func(self::$fallbackHandler);
             self::sendResponse(404, $response);
@@ -148,9 +157,9 @@ class Router
             echo self::sendResponse(404, 'Not Found');
         }
 
-        if($response === ''){
+        if ($response === '') {
             return $response;
-        }else {
+        } else {
             echo $response;
         }
     }
@@ -175,24 +184,34 @@ class Router
     }
 
 
-    public static function get($url, $handler, $middleware = null)
+    public static function route()
     {
-        return self::addRoute('GET', $url, $handler, $middleware);
-    }
+        
+        return new class {
+            public function get($url, $handler, $middleware = null)
+            {
+                 Router::addRoute('GET',  $url, $handler, $middleware);
+                 return $this;
+            }
 
-    public static function post($url, $handler, $middleware = null)
-    {
-        return self::addRoute('POST', $url, $handler, $middleware);
-    }
+            public function post($url, $handler, $middleware = null)
+            {
+                 Router::addRoute('POST', $url, $handler, $middleware);
+                 return $this;
+            }
 
-    public static function put($url, $handler, $middleware = null)
-    {
-        return self::addRoute('PUT', $url, $handler, $middleware);
-    }
+            public function put($url, $handler, $middleware = null)
+            {
+                 Router::addRoute('PUT', $url, $handler, $middleware);
+                 return $this;
+            }
 
-    public static function delete($url, $handler, $middleware = null)
-    {
-        return self::addRoute('DELETE', $url, $handler, $middleware);
+            public function delete($url, $handler, $middleware = null)
+            {
+                 Router::addRoute('DELETE', $url, $handler, $middleware);
+                 return $this;
+            }
+        };
     }
 
     private static function sendResponse($statusCode, $message)

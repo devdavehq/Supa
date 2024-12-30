@@ -2,7 +2,7 @@
 
 require 'vendor/autoload.php';
 
-class OrganizedPdoquery {
+class Squery {
     private $conn;
     private $table;
     private $params = [];
@@ -173,3 +173,18 @@ class OrganizedPdoquery {
         }
     }
 }
+
+
+
+// Assuming you have already instantiated the Squery class and set the table
+// $squery = new Squery();
+
+// // Construct the query
+// $result = $squery->from('users') // Specify the table
+//     ->select('age, COUNT(*) AS count') // Select age and count
+//     ->groupBy('age') // Group by age
+//     ->having('COUNT(*) > 1') // Filter groups with more than 1 user
+//     ->exec(); // Execute the query
+
+// // Output the result
+// print_r($result);

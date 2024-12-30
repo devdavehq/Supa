@@ -22,9 +22,6 @@ To install Supa, you will need Composer. Run the following command:
 
 composer install
 
-Additionally, some packages will need to be downloaded via npm for dynamic reloading to work:
-
-npm install
 
 ## Usage
 To use Supa, refer to the documentation provided in the project. You can find examples and detailed instructions on how to implement various features.

@@ -2,7 +2,6 @@
    
  //Include the Router logic
  require 'vendor/autoload.php';
- require 'core/_index.php';
 
         
 

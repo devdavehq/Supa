@@ -12,7 +12,7 @@ class CreateSchema extends Pdoconn {
         $this->mysqli = Dbconnsql::connectMysqli(); // Assuming MysqliConn is the class for MySQLi connection
     }
 
-    public function createDatabase($databaseName, $dbtype = null) {
+    public function createDatabase($databaseName, $dbtype = 'mysql') {
         // Validate database name
         if (!preg_match('/^[a-zA-Z0-9_]+$/', $databaseName)) {
             throw new InvalidArgumentException("Invalid database name.");
@@ -165,7 +165,7 @@ class CreateSchema extends Pdoconn {
 
 // // Create a new database
 // $databaseName = 'test_database';
-// $schemaCreator->createDatabase($databaseName);
+// $schemaCreator->createDatabase($databaseName, dbtype = mysql, pgsql and others);
 
 // // Define the table name and columns
 // $tableName = 'users';

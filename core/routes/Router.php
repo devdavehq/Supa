@@ -87,7 +87,7 @@ class Router
         return new Route($routeId);
     }
 
-    public static function handleRequest()
+    public static function handleRequest($response = '')
     {
         $method = $_SERVER['REQUEST_METHOD'];
         $path = $_SERVER['REQUEST_URI'];
@@ -146,6 +146,12 @@ class Router
             self::sendResponse(404, $response);
         } else {
             echo self::sendResponse(404, 'Not Found');
+        }
+
+        if($response === ''){
+            return $response;
+        }else {
+            echo $response;
         }
     }
 

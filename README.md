@@ -20,15 +20,38 @@ Supa is a PHP supercharger inspired by Laravel and Node.js. It enhances PHP's fu
 ## Installation
 To install Supa, you will need Composer. Run the following command:
 
-composer install
+composer install Supa
 
 
 ## Usage
 To use Supa, refer to the documentation provided in the project. You can find examples and detailed instructions on how to implement various features.
 
+
+## Technologies Used
+
+This library utilizes the following technologies:
+
+- **MySQL**: For relational database management.
+- **PostgreSQL**: For advanced SQL capabilities.
+- **Microsoft SQL Server (SQLSRV)**: For enterprise-level database solutions.
+- **MongoDB**: For NoSQL database management.
+
+
+
 ## Acknowledgments
 - **PHPMailer**: This project uses PHPMailer for email handling. [PHPMailer GitHub Repository](https://github.com/PHPMailer/PHPMailer)
   **Firebase JWT**: This project uses the Firebase JWT library (https://github.com/firebase/php-jwt) for handling JSON Web Tokens.
+  
+### Third-Party Libraries
+
+This library uses the following third-party libraries:
+
+- **MongoDB PHP Driver**: [MongoDB PHP Library](https://github.com/mongodb/mongo-php-library) - Licensed under the Apache License 2.0.
+
+
+Please refer to the respective documentation for more information on each technology.
+
+
 
 ## Contributing
 Supa is open source! Contributions are welcome. Please fork the repository and submit a pull request for any improvements or bug fixes.

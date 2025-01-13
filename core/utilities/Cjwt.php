@@ -5,7 +5,7 @@ require_once 'vendor/autoload.php'; // Ensure Composer's autoload is included
 use Firebase\JWT\JWT;
 use Firebase\JWT\ExpiredException;
 
-class JwtWrapper {
+class Cjwt {
     private $secret;
 
     public function __construct($secret) {

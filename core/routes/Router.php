@@ -1,5 +1,8 @@
 <?php
 // ob_start();
+
+namespace SUPA\routes;
+
 class Router
 {
     protected static $routes = [];
@@ -64,7 +67,7 @@ class Router
             if (is_string($middlewareOrName)) {
                 // Validate route name
                 if (isset(self::$namedRoutes[$middlewareOrName])) {
-                    throw new Exception("Route name '{$middlewareOrName}' already exists");
+                    throw new \Exception("Route name '{$middlewareOrName}' already exists");
                 }
                 $routeName = $middlewareOrName;
             } elseif (is_callable($middlewareOrName) || is_array($middlewareOrName)) {
@@ -87,8 +90,8 @@ class Router
         if ($routeName) {
             self::$namedRoutes[$routeName] = $routeId;
         }
-
-        return new Route($routeId);
+        // include_once 'Namedroute.php';
+        return new Mchain($routeId);
     }
 
     public static function handleRequest($response = '')
@@ -114,6 +117,11 @@ class Router
 
                     // Execute route-specific middleware
                     foreach ($route['middleware'] as $middleware) {
+                        if (is_callable($middleware)) {
+                            $middlewareResult = $middleware($allParams, $matches);
+                        } else {
+                            throw new \Exception("Middleware is not callable.");
+                        }
                         $middlewareResult = $middleware($allParams, $matches);
                         if ($middlewareResult === false) {
                             return; // Stop execution if middleware fails
@@ -239,7 +247,7 @@ class Router
     public static function url($name, $parameters = [])
     {
         if (!isset(self::$namedRoutes[$name])) {
-            throw new Exception("Route not found: $name");
+            throw new \Exception("Route not found: $name");
         }
         $url = self::$routes[self::$namedRoutes[$name]]['url'];
         foreach ($parameters as $key => $value) {
@@ -274,7 +282,38 @@ class Router
     }
 }
 
-include_once 'Namedroute.php';
+
+
+//  class for middlewarechaining routes
+class Mchain extends Router {
+    private $routeId;
+
+    public function __construct($routeId) {
+        $this->routeId = $routeId;
+        
+    }
+
+    public function middleware($middleware) {
+        // Add middleware to the route
+        if (is_string($middleware)) {
+            $middleware = [$middleware];
+        }
+        self::$routes[$this->routeId]['middleware'] = array_merge(
+            self::$routes[$this->routeId]['middleware'] ?? [],
+            $middleware
+        );
+        return $this; // Return $this for chaining
+    }
+
+   
+}
+
+
+
+
+
+
+
 
 
 // // Define middleware group

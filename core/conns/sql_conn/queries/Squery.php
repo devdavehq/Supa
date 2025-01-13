@@ -1,7 +1,11 @@
 <?php
 
+namespace SUPA\conns\sql_conn\queries;
+
+
 require 'vendor/autoload.php';
 
+use SUPA\conns\sql_conn\Conn;
 class Squery {
     private $conn;
     private $table;
@@ -12,7 +16,7 @@ class Squery {
     private $stmt; // Store the prepared statement
 
     public function __construct() {
-        $this->conn = Pdoconn::connectPDO(); // Get the PDO connection
+        $this->conn = Conn::connectPDO(); // Get the PDO connection
     }
 
     public function from($table) {
@@ -122,14 +126,14 @@ class Squery {
             $success = $this->stmt->execute();
 
             if (!$success) {
-                throw new Exception("Failed to execute statement: " . implode(", ", $this->stmt->errorInfo()));
+                throw new \Exception("Failed to execute statement: " . implode(", ", $this->stmt->errorInfo()));
             }
 
             // Handle different types of queries
             switch ($this->queryType) {
                 case 'SELECT':
                 case 'COUNT':
-                    return $this->stmt->fetchAll(PDO::FETCH_ASSOC); // Return all results for SELECT and COUNT queries
+                    return $this->stmt->fetchAll(\PDO::FETCH_ASSOC); // Return all results for SELECT and COUNT queries
 
                 case 'INSERT':
                     return $this->conn->lastInsertId(); // Return the insert ID for INSERT queries
@@ -139,9 +143,9 @@ class Squery {
                     return $this->stmt->rowCount(); // Return the number of affected rows for UPDATE/DELETE queries
 
                 default:
-                    throw new Exception("Unsupported query type: " . $this->queryType);
+                    throw new \Exception("Unsupported query type: " . $this->queryType);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Log the error instead of throwing it directly
             error_log($e->getMessage());
             return false; // Return false or handle as needed
@@ -164,12 +168,12 @@ class Squery {
     private static function getPdoType($type) {
         switch ($type) {
             case 'i':
-                return PDO::PARAM_INT;
+                return \PDO::PARAM_INT;
             case 'd':
-                return PDO::PARAM_STR; // PDO does not have a specific float type
+                return \PDO::PARAM_STR; // PDO does not have a specific float type
             case 's':
             default:
-                return PDO::PARAM_STR;
+                return \PDO::PARAM_STR;
         }
     }
 }

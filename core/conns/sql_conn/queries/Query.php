@@ -1,6 +1,11 @@
 <?php
 
+namespace SUPA\conns\sql_conn\queries;
+
+
 require 'vendor/autoload.php';
+
+use SUPA\conns\sql_conn\Conn;
 
 class Query {
 
@@ -8,7 +13,7 @@ class Query {
 
     public static function handler($sql, $params = [], $types = "") {
         // Get the database connection from Dbconn class
-        $conn = Pdoconn::connectPDO(); // Change to PDO connection
+        $conn = Conn::connectPDO(); // Change to PDO connection
 
         $stmt = null;
 
@@ -41,7 +46,7 @@ class Query {
             $success = $stmt->execute();
 
             if (!$success) {
-                throw new Exception("Failed to execute statement: " . implode(", ", $stmt->errorInfo()));
+                throw new \Exception("Failed to execute statement: " . implode(", ", $stmt->errorInfo()));
             }
 
             // Determine the type of query
@@ -60,9 +65,9 @@ class Query {
                     return $stmt->rowCount(); // Return the number of affected rows for UPDATE/DELETE queries
 
                 default:
-                    throw new Exception("Unsupported query type: " . $queryType);
+                    throw new \Exception("Unsupported query type: " . $queryType);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // Log the error instead of throwing it directly
             error_log($e->getMessage());
             return false; // Return false or handle as needed
@@ -85,12 +90,12 @@ class Query {
     private static function getPdoType($type) {
         switch ($type) {
             case 'i':
-                return PDO::PARAM_INT;
+                return \PDO::PARAM_INT;
             case 'd':
-                return PDO::PARAM_STR; // PDO does not have a specific float type
+                return \PDO::PARAM_STR; // PDO does not have a specific float type
             case 's':
             default:
-                return PDO::PARAM_STR;
+                return \PDO::PARAM_STR;
         }
     }
 } 

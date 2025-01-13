@@ -1,21 +1,24 @@
 <?php
 
+namespace SUPA\conns\sql_conn\queries;
+
 require 'vendor/autoload.php';
 
-class CreateSchema extends Pdoconn {
+use SUPA\conns\sql_conn\Conn;
+
+
+class Schema extends Conn {
     private $pdo; // PDO connection
-    private $mysqli; // MySQLi connection
 
     // Constructor to initialize connections
     public function __construct() {
-        $this->pdo = Pdoconn::connectPDO(); // Assuming Pdoconn is the class for PDO connection
-        $this->mysqli = Dbconnsql::connectMysqli(); // Assuming MysqliConn is the class for MySQLi connection
+        $this->pdo = Conn::connectPDO(); // Assuming Pdoconn is the class for PDO connection
     }
 
     public function createDatabase($databaseName, $dbtype = 'mysql') {
         // Validate database name
         if (!preg_match('/^[a-zA-Z0-9_]+$/', $databaseName)) {
-            throw new InvalidArgumentException("Invalid database name.");
+            throw new \InvalidArgumentException("Invalid database name.");
         }
 
         try {
@@ -26,13 +29,13 @@ class CreateSchema extends Pdoconn {
             switch (self::$dbType) { // Change to self:: if dbType is protected or public
                 case 'mysql':
                     // Check if the database exists
-                    $result = $this->mysqli->query("SHOW DATABASES LIKE '$databaseName'");
-                    if ($result->num_rows > 0) {
+                    $result = $this->pdo->query("SHOW DATABASES LIKE '$databaseName'");
+                    if ($result && $result->rowCount() > 0) {
                         echo "Database $databaseName already exists.\n";
                         return;
                     }
                     $sql = "CREATE DATABASE `$databaseName`";
-                    $this->mysqli->query($sql);
+                    $this->pdo->exec($sql);
                     break;
                 case 'pgsql':
                     // Check if the database exists
@@ -55,11 +58,11 @@ class CreateSchema extends Pdoconn {
                     $this->pdo->exec($sql);
                     break;
                 default:
-                    throw new Exception("Unsupported database type.");
+                    throw new \Exception("Unsupported database type.");
             }
        
             echo "Database $databaseName created successfully.\n";
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo "Error creating database: " . $e->getMessage() . "\n";
         }
     }
@@ -67,15 +70,15 @@ class CreateSchema extends Pdoconn {
     public function createTable($tableName, $columns) {
         // Validate table name
         if (!preg_match('/^[a-zA-Z0-9_]+$/', $tableName)) {
-            throw new InvalidArgumentException("Invalid table name.");
+            throw new \InvalidArgumentException("Invalid table name.");
         }
 
         // Check if the table exists
         try {
             switch (self::$dbType) { // Change to self:: if dbType is protected or public
                 case 'mysql':
-                    $result = $this->mysqli->query("SHOW TABLES LIKE '$tableName'");
-                    if ($result->num_rows > 0) {
+                    $result = $this->pdo->query("SHOW TABLES LIKE '$tableName'");
+                    if ($result && $result->rowCount() > 0) {
                         echo "Table $tableName already exists.\n";
                         return;
                     }
@@ -102,7 +105,7 @@ class CreateSchema extends Pdoconn {
                 //     }
                 //     break;
                 default:
-                    throw new Exception("Unsupported database type.");
+                    throw new \Exception("Unsupported database type.");
             }
 
             $columnsSQL = [];
@@ -117,7 +120,7 @@ class CreateSchema extends Pdoconn {
             // Execute the create table command
             $this->pdo->exec($sql); // Use PDO connection for table creation
             echo "Table $tableName created successfully.\n";
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo "Error creating table: " . $e->getMessage() . "\n";
         }
     }
@@ -125,7 +128,7 @@ class CreateSchema extends Pdoconn {
     public function updateTable($tableName, $columnName, $newDefinition) {
         // Validate table name and column name
         if (!preg_match('/^[a-zA-Z0-9_]+$/', $tableName) || !preg_match('/^[a-zA-Z0-9_]+$/', $columnName)) {
-            throw new InvalidArgumentException("Invalid table or column name.");
+            throw new \InvalidArgumentException("Invalid table or column name.");
         }
 
         try {
@@ -133,7 +136,7 @@ class CreateSchema extends Pdoconn {
             $alterSQL = "ALTER TABLE $tableName CHANGE $columnName $columnName " . $newDefinition['type'] . ' ' . implode(' ', $newDefinition['attributes']);
             $this->pdo->exec($alterSQL); // Use PDO connection for altering the table
             echo "Column $columnName in table $tableName updated successfully.\n";
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo "Error updating column: " . $e->getMessage() . "\n";
         }
     }
@@ -141,7 +144,7 @@ class CreateSchema extends Pdoconn {
     public function deleteColumn($tableName, $columnName) {
         // Validate table name and column name
         if (!preg_match('/^[a-zA-Z0-9_]+$/', $tableName) || !preg_match('/^[a-zA-Z0-9_]+$/', $columnName)) {
-            throw new InvalidArgumentException("Invalid table or column name.");
+            throw new \InvalidArgumentException("Invalid table or column name.");
         }
 
         try {
@@ -149,7 +152,7 @@ class CreateSchema extends Pdoconn {
             $dropSQL = "ALTER TABLE $tableName DROP COLUMN $columnName";
             $this->pdo->exec($dropSQL); // Use PDO connection for dropping the column
             echo "Column $columnName in table $tableName deleted successfully.\n";
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo "Error deleting column: " . $e->getMessage() . "\n";
         }
     }

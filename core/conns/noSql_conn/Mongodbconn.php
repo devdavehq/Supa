@@ -1,12 +1,16 @@
 <?php
 
+namespace SUPA\conns\nosql_conn;
+include "vendor/autoload.php";
+
+use MongoDB\Client;
 // MongoDB connection class
-class MongoDBConnection {
+class Mongodbconn {
     private $client;
     private $db;
 
     public function __construct($host, $database) {
-        $this->client = new MongoDB\Client("mongodb://$host");
+        $this->client = new Client("mongodb://$host");
         $this->db = $this->client->$database;
     }
 

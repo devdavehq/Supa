@@ -1,6 +1,6 @@
 <?php
 
-class CSRFProtection {
+class Csrf {
     public function __construct(){
         return;
     }

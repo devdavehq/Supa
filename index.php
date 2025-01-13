@@ -3,6 +3,7 @@
  //Include the Router logic
  require 'vendor/autoload.php';
 
+ use SUPA\routes\Router;
         
     Router::route()
     ->get("/", function ($allParams, $requestData, $status) {
@@ -89,11 +90,16 @@
 
         // Insert user data into the database
         $squery->from('users')->insert([
-            'username' => $requestData['username'],
-            'email' => $requestData['email'],
-            'password' => password_hash($requestData['password'], PASSWORD_BCRYPT),
-            'file_path' => $uploadResult['files'][0]['path']
-        ])->exec();
+            'username' => "?",
+            'email' => "?",
+            'password' => "?",
+            'file_path' => "?"
+        ])->exec([
+             $requestData['username'],
+            $requestData['email'],
+            password_hash($requestData['password'], PASSWORD_BCRYPT),
+            $uploadResult['files'][0]['path']
+        ], 'ssss');
 
         $_SESSION['email'] = $requestData['email']; // Store email in session
         return jsonResponse(['status' => 'success', 'message' => 'User registered successfully']);

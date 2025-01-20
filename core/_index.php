@@ -12,4 +12,18 @@
         require_once $file;
     }
    
+    // function autoloadFunctions($functionName) {
+    //     // Define the path to your functions directory
+    //     $functionFile = "core/utilities/{$functionName}.php";
+        
+    //     if (file_exists($functionFile)) {
+    //         include $functionFile;
+    //     }
+    // }
+    
+    // // Register the autoload function
+    // spl_autoload_register('autoloadFunctions');
+
+   
+
 

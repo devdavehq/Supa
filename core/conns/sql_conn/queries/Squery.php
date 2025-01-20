@@ -32,7 +32,7 @@ class Squery {
 
     public function insert($data) {
         $this->queryType = 'INSERT';
-        $this->sql = "INSERT INTO " . $this->table . " (" . implode(", ", array_keys($data)) . ") VALUES (" . rtrim(str_repeat("?, ", count($data)), ', ') . ")";
+        $this->sql = "INSERT INTO " . $this->table . " (" . implode(", ", array_values($data)) . ") VALUES (" . rtrim(str_repeat("?, ", count($data)), ', ') . ")";
         return $this;
     }
 

@@ -4,6 +4,8 @@
  require 'vendor/autoload.php';
 
  use SUPA\routes\Router;
+ use SUPA\conns\sql_conn\queries\Squery;
+
         
     Router::route()
     ->get("/", function ($allParams, $requestData, $status) {
@@ -89,11 +91,7 @@
         }
 
         // Insert user data into the database
-        $squery->from('users')->insert([
-            'username' => "?",
-            'email' => "?",
-            'password' => "?",
-            'file_path' => "?"
+        $squery->from('users')->insert(['username','email','password','file_path'
         ])->exec([
              $requestData['username'],
             $requestData['email'],

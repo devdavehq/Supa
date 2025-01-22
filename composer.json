@@ -11,6 +11,10 @@
         "files": [
             "core/_index.php"
         ]
+    },"scripts": {
+        "post-install-cmd": [
+            "@php -r \"copy('vendor/devdavehq/supa/index.php', 'index.php');\""
+        ]
     },
     "authors": [
         {

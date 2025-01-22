@@ -3,7 +3,7 @@
     "type": "library",
     "version": "1.0.0",
     "license": "MIT",
-    "minimum-stability": "dev",
+    "minimum-stability": "beta",
     "prefer-stable": true,
 
     "autoload": {
@@ -18,6 +18,12 @@
         {
             "name": "David"
         }
+    ],
+    "repositories": [
+    {
+        "type": "vcs",
+        "url": "https://github.com/devdavehq/supa"
+    }
     ],
     "require": {
         "mongodb/mongodb": "^1.0",

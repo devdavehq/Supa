@@ -3,6 +3,9 @@
     "type": "library",
     "version": "1.0.0",
     "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+
     "autoload": {
         "psr-4": {
             "SUPA\\": "core/"

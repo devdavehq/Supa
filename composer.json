@@ -1,18 +1,13 @@
 {
     "name": "devdavehq/supa",
     "type": "library",
-    "version": "1.0.0",
     "license": "MIT",
-    "minimum-stability": "beta",
+    "minimum-stability": "stable",
     "prefer-stable": true,
-
     "autoload": {
         "psr-4": {
             "SUPA\\": "core/"
-        },
-        "files": [
-            "core/_index.php"
-        ]
+        }
     },
     "authors": [
         {
@@ -20,10 +15,10 @@
         }
     ],
     "repositories": [
-    {
-        "type": "vcs",
-        "url": "https://github.com/devdavehq/supa"
-    }
+        {
+            "type": "vcs",
+            "url": "https://github.com/devdavehq/supa"
+        }
     ],
     "require": {
         "mongodb/mongodb": "^1.0",
@@ -33,6 +28,6 @@
         "react/http": "^1.0",
         "react/socket": "^1.0",
         "firebase/php-jwt": "^6.10",
-        "php": ">=7.4" 
+        "php": ">=7.4"
     }
 }

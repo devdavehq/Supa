@@ -2,18 +2,23 @@
 
 namespace SUPA\conns\sql_conn\queries;
 
-
 require 'vendor/autoload.php';
 
 use SUPA\conns\sql_conn\Conn;
 
 class Query {
+    private $dbname;
+    private $dbpass;
 
-    // ... existing code ...
+    // Constructor to accept dbname and dbpass
+    public function __construct($dbname = null, $dbpass = null) {
+        $this->dbname = $dbname;
+        $this->dbpass = $dbpass;
+    }
 
-    public static function handler($sql, $params = [], $types = "") {
-        // Get the database connection from Dbconn class
-        $conn = Conn::connectPDO(); // Change to PDO connection
+    public function handler($sql, $params = [], $types = "") {
+        // Get the database connection with the specified dbname and dbpass
+        $conn = Conn::connectPDO($this->dbname, $this->dbpass);
 
         $stmt = null;
 
@@ -26,8 +31,6 @@ class Query {
         try {
             // Prepare the SQL statement
             $stmt = $conn->prepare($sql);
-
-            // ... existing code ...
 
             // Bind parameters if they exist
             if (!empty($params)) {
@@ -98,9 +101,7 @@ class Query {
                 return \PDO::PARAM_STR;
         }
     }
-} 
-
-
+}
 
 //  Usage
 
@@ -142,4 +143,17 @@ class Query {
 //     print_r($posts); // Output the posts
 // } else {
 //     echo "Error fetching posts.";
+// }
+// $query = new Query('test_database', 'password');
+
+// Example query
+// $sql = "SELECT * FROM users WHERE email = ?";
+// $params = ['user@example.com'];
+// $result = $query->handler($sql, $params, 's');
+
+// if ($result) {
+//     $user = $result->fetch(\PDO::FETCH_ASSOC);
+//     print_r($user);
+// } else {
+//     echo "Error fetching user.";
 // }

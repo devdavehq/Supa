@@ -1,27 +1,20 @@
 <?php
 
 class Validator {
-    private static $instance = null;
     private $data = [];
     private $errors = [];
     
-    // Private constructor for singleton
-    private function __construct($formData) {
+    // Constructor
+    public function __construct($formData) {
         $this->data = $formData;
     }
     
-    // Get validator instance
+    // Create a new validator instance
     public static function check($formData) {
-        if (self::$instance === null) {
-            self::$instance = new self($formData);
-        } else {
-            // Automatically clear errors and set new data
-            self::$instance->errors = [];
-            self::$instance->data = $formData;
-        }
-        return self::$instance;
+        return new self($formData);
     }
     
+    // Validate a field against rules
     public function validate($field, array $rules) {
         $value = $this->data[$field] ?? '';
         
@@ -37,28 +30,60 @@ class Validator {
                 $params = explode(',', $paramStr);
             }
 
-            $valid = match($rule) {
-                'required' => !empty(trim($value)),
-                'email' => filter_var($value, FILTER_VALIDATE_EMAIL) !== false,
-                'min' => strlen($value) >= (int)($params[0] ?? 0),
-                'max' => strlen($value) <= (int)($params[0] ?? 0),
-                'numeric' => is_numeric($value),
-                'alpha' => ctype_alpha($value),
-                'alphanumeric' => ctype_alnum($value),
-                default => true
-            };
+            $valid = false; // Initialize $valid
+
+            switch ($rule) {
+                case 'required':
+                    $valid = !empty(trim($value));
+                    break;
+                case 'email':
+                    $valid = filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+                    break;
+                case 'min':
+                    $valid = strlen($value) >= (int)($params[0] ?? 0);
+                    break;
+                case 'max':
+                    $valid = strlen($value) <= (int)($params[0] ?? 0);
+                    break;
+                case 'numeric':
+                    $valid = is_numeric($value);
+                    break;
+                case 'alpha':
+                    $valid = ctype_alpha($value);
+                    break;
+                case 'alphanumeric':
+                    $valid = ctype_alnum($value);
+                    break;
+                default:
+                    $valid = true; // Default case
+                    break;
+            }
 
             if (!$valid) {
-                $defaultMsg = match($rule) {
-                    'required' => "$field is required",
-                    'email' => "$field must be a valid email",
-                    'min' => "$field must be at least {$params[0]} characters",
-                    'max' => "$field must not exceed {$params[0]} characters",
-                    'numeric' => "$field must be numeric",
-                    'alpha' => "$field must contain only letters",
-                    'alphanumeric' => "$field must contain only letters and numbers",
-                    default => "$field is invalid"
-                };
+                $defaultMsg = "$field is invalid"; // Default error message
+                switch ($rule) {
+                    case 'required':
+                        $defaultMsg = "$field is required";
+                        break;
+                    case 'email':
+                        $defaultMsg = "$field must be a valid email";
+                        break;
+                    case 'min':
+                        $defaultMsg = "$field must be at least {$params[0]} characters";
+                        break;
+                    case 'max':
+                        $defaultMsg = "$field must not exceed {$params[0]} characters";
+                        break;
+                    case 'numeric':
+                        $defaultMsg = "$field must be numeric";
+                        break;
+                    case 'alpha':
+                        $defaultMsg = "$field must contain only letters";
+                        break;
+                    case 'alphanumeric':
+                        $defaultMsg = "$field must contain only letters and numbers";
+                        break;
+                }
 
                 $this->errors[$field][] = $errorMsg ?? $defaultMsg;
             }
@@ -67,6 +92,7 @@ class Validator {
         return $this;
     }
 
+    // Add a custom validation rule
     public function addRule($field, $callback, $errorMsg) {
         $value = $this->data[$field] ?? '';
         
@@ -77,10 +103,12 @@ class Validator {
         return $this;
     }
 
+    // Check if validation failed
     public function failed() {
         return !empty($this->errors);
     }
     
+    // Get all errors
     public function getErrors() {
         return [
             'errors' => $this->errors,        // All errors
@@ -89,10 +117,12 @@ class Validator {
         ];
     }
 
+    // Get errors for a specific field
     public function getFieldError($field) {
         return $this->errors[$field] ?? [];
     }
 
+    // Get the first error for each field
     private function getFirstErrors(): array {
         $firstErrors = [];
         foreach ($this->errors as $field => $errors) {
@@ -101,42 +131,36 @@ class Validator {
         return $firstErrors;
     }
 
+    // Clear all errors
     public function clear(): self {
         $this->errors = [];
         return $this;
     }
 }
 
-//  normal usage
 
+// usage 
+// $validator = Validator::check($_POST)
+//     ->validate('username', ['required', 'min:3'])
+//     ->validate('email', ['required', 'email']);
 
+// if ($validator->failed()) {
+//     $errors = $validator->getErrors();
+//     // Handle errors
+// } else {
+//     // Process valid form
+// }
+// $validator = Validator::check($_POST)
+//     ->validate('username', ['required', 'min:3'])
+//     ->validate('email', ['required', 'email']);
 
-
-
-// Apis and ajax
-
-//    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-//     Validator::check($_POST)
-//         ->validate('username', ['required', 'min:3'])
-//         ->validate('email', ['required', 'email']);
-
-//     if (Validator::check($_POST)->failed()) {
-//         header('Content-Type: application/json');  set tis before
-//         echo json_encode([
-//             'status' => 'error',
-//             'errors' => Validator::check($_POST)->getErrors()
-//         ]);
-//         exit;
-//     }
-    
-//     // Process valid form...
-//     echo json_encode(['status' => 'success']);
-// } 
-
-
-
-// Correct usage:
-// Validator::check($_POST)
+// if ($validator->failed()) {
+//     $errors = $validator->getErrors();
+//     // Handle errors
+// } else {
+//     // Process valid form
+// }
+// $validator = Validator::check($_POST)
 //     ->validate('password', [
 //         'required' => 'Password required',
 //         'min:8' => 'Too short'
@@ -150,7 +174,7 @@ class Validator {
 //         'Need a number'
 //     );
 
-// // Wrong usage (don't do this):
-// Validator::check($_POST)
-//     ->addRule('password', fn($value) => preg_match('/[A-Z]/', $value), 'Need uppercase')
-//     ->validate('password', ['required']);  // Should validate first
+// if ($validator->failed()) {
+//     $errors = $validator->getErrors();
+//     // Handle errors
+// }

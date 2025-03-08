@@ -1,3 +1,4 @@
+<?php
 namespace SUPA\conns\sql_conn;
 
 class Conn {
@@ -8,6 +9,7 @@ class Conn {
     private static $pdo = null; // Store the PDO instance
     private static $dbname = ''; // sqlite database only
     private static $dbpass = ''; // Store database password dynamically
+    private static $isConnected = false; // Track connection state
 
     // Get the static connection
     public static function connectPDO($dbname = null, $dbpass = null) {
@@ -21,7 +23,7 @@ class Conn {
             self::$dbpass = $dbpass;
         }
 
-        if (self::$pdo === null) { // Check if the connection is already established
+        if (self::$pdo === null || !self::$isConnected) { // Check if the connection is already established
             try {
                 switch (self::$dbType) {
                     case 'mysql':
@@ -51,6 +53,7 @@ class Conn {
 
                 self::$pdo = new \PDO($dsn, self::$user, $passwordToUse);
                 self::$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION); // Set error mode
+                self::$isConnected = true; // Mark as connected
             } catch (\PDOException $e) {
                 error_log("Connection failed: " . $e->getMessage());
                 return null; // Handle connection failure
@@ -62,5 +65,16 @@ class Conn {
     // Close the static connection
     public static function closeConnection() {
         self::$pdo = null; // Close the connection
+        self::$isConnected = false; // Mark as disconnected
+    }
+
+    // Get the current database name
+    public static function getDbName() {
+        return self::$dbname;
+    }
+
+    // Get the current database password
+    public static function getDbPass() {
+        return self::$dbpass;
     }
 }

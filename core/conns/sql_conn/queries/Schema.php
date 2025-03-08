@@ -11,7 +11,7 @@ class Schema extends Conn {
     private $pdo; // PDO connection
 
     // Constructor to initialize connections
-    public function __construct($dbname = '', $dbpass '') {
+    public function __construct($dbname = '', $dbpass = '') {
         $this->pdo = Conn::connectPDO($dbname, $dbpass); // Assuming Pdoconn is the class for PDO connection
     }
 
@@ -207,3 +207,16 @@ class Schema extends Conn {
 
 // // Delete a column (e.g., remove the 'name' column)
 // $schemaCreator->deleteColumn('users', 'name');
+// $query = new Query('test_database', 'password');
+
+// Example query
+// $sql = "SELECT * FROM users WHERE email = ?";
+// $params = ['user@example.com'];
+// $result = $query->handler($sql, $params, 's');
+
+// if ($result) {
+//     $user = $result->fetch(\PDO::FETCH_ASSOC);
+//     print_r($user);
+// } else {
+//     echo "Error fetching user.";
+// }

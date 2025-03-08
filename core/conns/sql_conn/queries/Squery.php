@@ -2,10 +2,10 @@
 
 namespace SUPA\conns\sql_conn\queries;
 
-
 require 'vendor/autoload.php';
 
 use SUPA\conns\sql_conn\Conn;
+
 class Squery {
     private $conn;
     private $table;
@@ -14,9 +14,14 @@ class Squery {
     private $queryType;
     private $sql;
     private $stmt; // Store the prepared statement
+    private $dbname;
+    private $dbpass;
 
-    public function __construct() {
-        $this->conn = Conn::connectPDO(); // Get the PDO connection
+    // Constructor to accept dbname and dbpass
+    public function __construct($dbname = null, $dbpass = null) {
+        $this->dbname = $dbname;
+        $this->dbpass = $dbpass;
+        $this->conn = Conn::connectPDO($this->dbname, $this->dbpass); // Get the PDO connection
     }
 
     public function from($table) {
@@ -32,13 +37,15 @@ class Squery {
 
     public function insert($data) {
         $this->queryType = 'INSERT';
-        $this->sql = "INSERT INTO " . $this->table . " (" . implode(", ", array_values($data)) . ") VALUES (" . rtrim(str_repeat("?, ", count($data)), ', ') . ")";
+        $this->sql = "INSERT INTO " . $this->table . " (" . implode(", ", array_keys($data)) . ") VALUES (" . rtrim(str_repeat("?, ", count($data)), ', ') . ")";
+        $this->params = array_values($data); // Store the parameters to be bound
         return $this;
     }
 
     public function update($data) {
         $this->queryType = 'UPDATE';
         $this->sql = "UPDATE " . $this->table . " SET " . implode(" = ?, ", array_keys($data)) . " = ?";
+        $this->params = array_values($data); // Store the parameters to be bound
         return $this;
     }
 
@@ -93,6 +100,7 @@ class Squery {
         $this->sql = "TRUNCATE TABLE " . $this->table;
         return $this;
     }
+
     public function exec($params = [], $types = "") {
         $this->params = $params; // Store the parameters to be bound
         $this->types = $types; // Store the types of the parameters
@@ -178,7 +186,7 @@ class Squery {
     }
 }
 
-
+//  usage
 
 // Assuming you have already instantiated the Squery class and set the table
 // $squery = new Squery();
@@ -192,3 +200,64 @@ class Squery {
 
 // // Output the result
 // print_r($result);
+
+// Include the necessary class files
+// require 'vendor/autoload.php';
+
+// use SUPA\conns\sql_conn\queries\Squery;
+
+// // Create an instance of the Squery class with dbname and dbpass
+// $query = new Squery('test_database', 'password');
+
+// // Example SELECT query
+// $results = $query->from('users')
+//     ->select('*')
+//     ->where('email = ?')
+//     ->exec(['user@example.com'], 's');
+
+// if ($results) {
+//     print_r($results);
+// } else {
+//     echo "Error fetching users.";
+// }
+
+// // Example INSERT query
+// $insertId = $query->from('users')
+//     ->insert([
+//         'name' => 'John Doe',
+//         'email' => 'john@example.com',
+//         'created_at' => date('Y-m-d H:i:s')
+//     ])
+//     ->exec();
+
+// if ($insertId) {
+//     echo "Inserted record with ID: $insertId";
+// } else {
+//     echo "Error inserting record.";
+// }
+
+// // Example UPDATE query
+// $affectedRows = $query->from('users')
+//     ->update([
+//         'name' => 'Jane Doe'
+//     ])
+//     ->where('id = ?')
+//     ->exec([1], 'i');
+
+// if ($affectedRows) {
+//     echo "Updated $affectedRows rows.";
+// } else {
+//     echo "Error updating record.";
+// }
+
+// // Example DELETE query
+// $affectedRows = $query->from('users')
+//     ->delete()
+//     ->where('id = ?')
+//     ->exec([1], 'i');
+
+// if ($affectedRows) {
+//     echo "Deleted $affectedRows rows.";
+// } else {
+//     echo "Error deleting record.";
+// }

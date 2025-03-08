@@ -10,15 +10,15 @@ use PHPMailer\PHPMailer\Exception;
 class Mailer {
     private $mail;
 
-    public function __construct() {
+    public function __construct($config) {
         $this->mail = new PHPMailer(true);
         $this->mail->isSMTP();
-        $this->mail->Host = 'smtp.example.com';
-        $this->mail->SMTPAuth = true;
-        $this->mail->Username = 'your_email@example.com';
-        $this->mail->Password = 'your_password';
+        $this->mail->Host = $config['host'] || 'smtp.gmail.com';
+        $this->mail->SMTPAuth = $config['auth'] || true;
+        $this->mail->Username = $config['username'] || 'your-email@gmail.com';
+        $this->mail->Password = $config['password'] || 'your-app-password';
         $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $this->mail->Port = 587;
+        $this->mail->Port = $config['port'] || 587;
     }
 
     public function to($recipient) {

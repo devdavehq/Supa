@@ -11,8 +11,8 @@ class Schema extends Conn {
     private $pdo; // PDO connection
 
     // Constructor to initialize connections
-    public function __construct($dbname) {
-        $this->pdo = Conn::connectPDO($dbname); // Assuming Pdoconn is the class for PDO connection
+    public function __construct($dbname = '', $dbpass '') {
+        $this->pdo = Conn::connectPDO($dbname, $dbpass); // Assuming Pdoconn is the class for PDO connection
     }
 
     public function createDatabase($databaseName, $dbtype = 'mysql') {

@@ -10,7 +10,7 @@ class Squery {
     private $conn;
     private $table;
     private $params = [];
-    private $types = [];
+    private $types = '';
     private $queryType;
     private $sql;
     private $stmt; // Store the prepared statement
@@ -21,7 +21,7 @@ class Squery {
     public function __construct($dbname = null, $dbpass = null) {
         $this->dbname = $dbname;
         $this->dbpass = $dbpass;
-        $this->conn = Conn::connectPDO($this->dbname, $this->dbpass); // Get the PDO connection
+        $this->conn = Conn::connectPDO($this->dbname, $this->dbpass);
     }
 
     public function from($table) {
@@ -38,7 +38,7 @@ class Squery {
     public function insert($data) {
         $this->queryType = 'INSERT';
         $this->sql = "INSERT INTO " . $this->table . " (" . implode(", ", array_keys($data)) . ") VALUES (" . rtrim(str_repeat("?, ", count($data)), ', ') . ")";
-        $this->params = array_values($data); // Store the parameters to be bound
+        $this->params = array_values($data);
         return $this;
     }
 
@@ -102,63 +102,113 @@ class Squery {
     }
 
     public function exec($params = [], $types = "") {
-        $this->params = $params; // Store the parameters to be bound
-        $this->types = $types; // Store the types of the parameters
-        return $this->execute(); // Call the execute method to run the query
+        // Convert string types to empty array to prevent issues
+        if (is_string($params) {
+            $params = [];
+        }
+    
+        // Handle parameter merging
+        if (empty($params) {
+            if (in_array($this->queryType, ['INSERT', 'UPDATE'])) {
+                // Ensure stored params is an array
+                if (!is_array($this->params)) {
+                    $this->params = [];
+                }
+                $params = $this->params;
+            } elseif ($this->queryType === 'DELETE' && !str_contains(strtoupper($this->sql), 'WHERE')) {
+                throw new \RuntimeException('DELETE requires WHERE clause');
+            }
+        }
+    
+        // Final type safety check
+        if (!is_array($params)) {
+            $params = [];
+        }
+    
+        $this->params = $params;
+        $this->types = $types;
+        return $this->execute();
     }
-
     private function execute() {
         // Validate SQL query to prevent SQL injection
         if (!self::isValidSql($this->sql)) {
             error_log("Invalid SQL query: " . $this->sql);
-            return false; // Return false or handle as needed
+            return false;
         }
-
+    
         try {
-            $this->stmt = $this->conn->prepare($this->sql); // Prepare the SQL statement
-
+            $this->stmt = $this->conn->prepare($this->sql);
+    
             // Bind parameters if they exist
             if (!empty($this->params)) {
-                // Validate and set types if none are provided
-                if ($this->types === "") {
-                    $this->types = str_repeat("s", count($this->params)); // Default to string
+                // If types string wasn't provided, detect types automatically
+                if (empty($this->types)) {
+                    $this->types = '';
+                    foreach ($this->params as $param) {
+                        if (is_int($param)) {
+                            $this->types .= 'i';
+                        } elseif (is_float($param)) {
+                            $this->types .= 'd';
+                        } elseif (is_bool($param)) {
+                            $this->types .= 'i'; // MySQL treats booleans as integers
+                        } elseif (is_null($param)) {
+                            $this->types .= 's'; // NULL is typically bound as string
+                        } else {
+                            $this->types .= 's';
+                        }
+                    }
                 }
-
-                // Bind parameters using a loop
+    
+                // Ensure types string matches the number of parameters
+                if (strlen($this->types) !== count($this->params)) {
+                    error_log("Number of types doesn't match number of parameters");
+                    return false;
+                }
+    
+                // Bind parameters with their types
                 foreach ($this->params as $key => $param) {
-                    $this->stmt->bindValue($key + 1, $param, self::getPdoType($this->types[$key])); // Bind parameters
+                    $typeChar = $this->types[$key] ?? 's'; // Default to string if type not specified
+                    $pdoType = self::getPdoType($typeChar);
+                    
+                    // Handle NULL values specially
+                    if (is_null($param)) {
+                        $this->stmt->bindValue($key + 1, null, \PDO::PARAM_NULL);
+                    } else {
+                        $this->stmt->bindValue($key + 1, $param, $pdoType);
+                    }
                 }
             }
-
+    
             // Execute the statement
             $success = $this->stmt->execute();
-
+    
             if (!$success) {
                 throw new \Exception("Failed to execute statement: " . implode(", ", $this->stmt->errorInfo()));
             }
-
+    
             // Handle different types of queries
             switch ($this->queryType) {
                 case 'SELECT':
                 case 'COUNT':
-                    return $this->stmt->fetchAll(\PDO::FETCH_ASSOC); // Return all results for SELECT and COUNT queries
-
+                    return $this->stmt->fetchAll(\PDO::FETCH_ASSOC);
+    
                 case 'INSERT':
-                    return $this->conn->lastInsertId(); // Return the insert ID for INSERT queries
-
+                    return $this->conn->lastInsertId();
+    
                 case 'UPDATE':
                 case 'DELETE':
-                    return $this->stmt->rowCount(); // Return the number of affected rows for UPDATE/DELETE queries
-
+                    return $this->stmt->rowCount();
+    
                 default:
                     throw new \Exception("Unsupported query type: " . $this->queryType);
             }
         } catch (\Exception $e) {
-            // Log the error instead of throwing it directly
             error_log($e->getMessage());
-            return false; // Return false or handle as needed
+            return false;
         }
     }
+    
+   
 
     /**
      * Validates the SQL query to prevent SQL injection.

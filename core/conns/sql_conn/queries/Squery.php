@@ -102,46 +102,42 @@ class Squery {
     }
 
     public function exec($params = [], $types = "") {
-        // Convert string types to empty array to prevent issues
-        if (is_string($params) {
-            $params = [];
-        }
-    
-        // Handle parameter merging
-        if (empty($params) {
-            if (in_array($this->queryType, ['INSERT', 'UPDATE'])) {
-                // Ensure stored params is an array
-                if (!is_array($this->params)) {
-                    $this->params = [];
-                }
-                $params = $this->params;
-            } elseif ($this->queryType === 'DELETE' && !str_contains(strtoupper($this->sql), 'WHERE')) {
-                throw new \RuntimeException('DELETE requires WHERE clause');
+        // Fix parameter type checking
+        if (!is_array($params)) {
+            if ($params === null) {
+                $params = [];
+            } else {
+                throw new \InvalidArgumentException('Params must be an array');
             }
         }
-    
-        // Final type safety check
-        if (!is_array($params)) {
-            $params = [];
+
+        // Handle parameter merging safely
+        if (empty($params) && in_array($this->queryType, ['INSERT', 'UPDATE'])) {
+            $params = is_array($this->params) ? $this->params : [];
         }
-    
+
+        // Validate DELETE operations
+        if ($this->queryType === 'DELETE' && !str_contains(strtoupper($this->sql), 'WHERE')) {
+            throw new \RuntimeException('DELETE requires WHERE clause for safety');
+        }
+
         $this->params = $params;
         $this->types = $types;
         return $this->execute();
     }
+
     private function execute() {
-        // Validate SQL query to prevent SQL injection
-        if (!self::isValidSql($this->sql)) {
-            error_log("Invalid SQL query: " . $this->sql);
-            return false;
-        }
-    
         try {
+
+            if (!self::isValidSql($this->sql)) {
+                error_log("Invalid SQL query: " . $this->sql);
+                return false;
+            }
             $this->stmt = $this->conn->prepare($this->sql);
-    
-            // Bind parameters if they exist
+
+            // Improved parameter binding
             if (!empty($this->params)) {
-                // If types string wasn't provided, detect types automatically
+                // Auto-detect types if not provided
                 if (empty($this->types)) {
                     $this->types = '';
                     foreach ($this->params as $param) {
@@ -158,53 +154,45 @@ class Squery {
                         }
                     }
                 }
-    
-                // Ensure types string matches the number of parameters
-                if (strlen($this->types) !== count($this->params)) {
-                    error_log("Number of types doesn't match number of parameters");
-                    return false;
-                }
-    
-                // Bind parameters with their types
                 foreach ($this->params as $key => $param) {
-                    $typeChar = $this->types[$key] ?? 's'; // Default to string if type not specified
-                    $pdoType = self::getPdoType($typeChar);
+                    $typeChar = $this->types[$key] ?? 's';
+                    $pdoType = $this->getPdoType($typeChar);
                     
-                    // Handle NULL values specially
-                    if (is_null($param)) {
+                    // Special handling for NULL values
+                    if ($param === null) {
                         $this->stmt->bindValue($key + 1, null, \PDO::PARAM_NULL);
                     } else {
                         $this->stmt->bindValue($key + 1, $param, $pdoType);
                     }
                 }
             }
-    
-            // Execute the statement
-            $success = $this->stmt->execute();
-    
-            if (!$success) {
-                throw new \Exception("Failed to execute statement: " . implode(", ", $this->stmt->errorInfo()));
+
+            if (!$this->stmt->execute()) {
+                throw new \RuntimeException(
+                    "Query failed: " . implode(" - ", $this->stmt->errorInfo())
+                );
             }
-    
-            // Handle different types of queries
-            switch ($this->queryType) {
-                case 'SELECT':
-                case 'COUNT':
-                    return $this->stmt->fetchAll(\PDO::FETCH_ASSOC);
-    
-                case 'INSERT':
-                    return $this->conn->lastInsertId();
-    
-                case 'UPDATE':
-                case 'DELETE':
-                    return $this->stmt->rowCount();
-    
-                default:
-                    throw new \Exception("Unsupported query type: " . $this->queryType);
-            }
+
+            return $this->fetchResults();
         } catch (\Exception $e) {
-            error_log($e->getMessage());
-            return false;
+            error_log("SQL Error: " . $e->getMessage());
+            throw $e; // Re-throw for proper error handling
+        }
+    }
+
+    private function fetchResults() {
+        switch ($this->queryType) {
+            case 'SELECT':
+                return $this->stmt->fetchAll(\PDO::FETCH_ASSOC);
+            case 'COUNT':
+                return $this->stmt->fetchColumn();
+            case 'INSERT':
+                return $this->conn->lastInsertId();
+            case 'UPDATE':
+            case 'DELETE':
+                return $this->stmt->rowCount();
+            default:
+                return true;
         }
     }
     
@@ -223,17 +211,7 @@ class Squery {
         return in_array($queryType, $allowedCommands);
     }
 
-    private static function getPdoType($type) {
-        switch ($type) {
-            case 'i':
-                return \PDO::PARAM_INT;
-            case 'd':
-                return \PDO::PARAM_STR; // PDO does not have a specific float type
-            case 's':
-            default:
-                return \PDO::PARAM_STR;
-        }
-    }
+    
 }
 
 //  usage

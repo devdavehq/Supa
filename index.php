@@ -71,7 +71,7 @@
         if ($validator->failed()) {
             return jsonResponse(['status' => 'error', 'errors' => $validator->getErrors()]);
         }
-        $validator->clear()
+        $validator->clear();
         // Check if user already exists
         $squery = new Squery();
         $existingUser = $squery->from('users')->where("email = '{$requestData['email']}'")->exec();

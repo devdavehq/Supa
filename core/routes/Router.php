@@ -109,7 +109,7 @@ class Router
                 if ($matches !== false) {
                     $routeMatched = true; // Set the flag to true if a route is matched
                     $queryParams = [];
-                    $queryString = parse_url($path, component: PHP_URL_QUERY);
+                    $queryString = parse_url($path,  PHP_URL_QUERY);
                     if ($queryString !== null) {
                         parse_str($queryString, $queryParams);
                     }
@@ -119,12 +119,11 @@ class Router
                     foreach ($route['middleware'] as $middleware) {
                         if (is_callable($middleware)) {
                             $middlewareResult = $middleware($allParams, $matches);
+                            if ($middlewareResult === false) {
+                                return; // Stop execution if middleware fails
+                            }
                         } else {
                             throw new \Exception("Middleware is not callable.");
-                        }
-                        $middlewareResult = $middleware($allParams, $matches);
-                        if ($middlewareResult === false) {
-                            return; // Stop execution if middleware fails
                         }
                     }
 

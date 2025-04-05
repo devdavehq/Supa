@@ -211,7 +211,17 @@ class Squery {
         return in_array($queryType, $allowedCommands);
     }
 
-    
+    private static function getPdoType($type) {
+        switch ($type) {
+            case 'i':
+                return \PDO::PARAM_INT;
+            case 'd':
+                return \PDO::PARAM_STR; // PDO does not have a specific float type
+            case 's':
+            default:
+                return \PDO::PARAM_STR;
+        }
+    }
 }
 
 //  usage

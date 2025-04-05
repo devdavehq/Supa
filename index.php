@@ -5,7 +5,7 @@
 
  use SUPA\routes\Router;
  use SUPA\conns\sql_conn\queries\Squery;
-
+ 
         
     Router::route()
     ->get("/", function ($allParams, $requestData, $status) {

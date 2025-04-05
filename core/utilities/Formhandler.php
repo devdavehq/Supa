@@ -262,6 +262,7 @@ class Validator {
                 ]
             ];
         }
+        
     }
 
     public function validate($field, $rules) {

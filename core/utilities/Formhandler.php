@@ -262,7 +262,7 @@ class Validator {
                 ]
             ];
         }
-        
+
     }
 
     public function validate($field, $rules) {
@@ -280,6 +280,7 @@ class Validator {
                 $this->addError($field, $errorMsg, $ruleName, $params);
             }
         }
+        
         
         return $this;
     }

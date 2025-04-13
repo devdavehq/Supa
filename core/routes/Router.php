@@ -137,9 +137,19 @@ class Router
                             break;
                         case 'PUT':
                         case 'DELETE':
+                        case 'PATCH':  // Added PATCH method for completeness
                             $input = file_get_contents("php://input");
                             if (!empty($input)) {
-                                parse_str($input, $requestData);
+                                // Check if content is JSON
+                                if (isset($_SERVER['CONTENT_TYPE']) && 
+                                    strpos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false) {
+                                    $requestData = json_decode($input, true);
+                                    if (json_last_error() !== JSON_ERROR_NONE) {
+                                        $requestData = [];
+                                    }
+                                } else {
+                                    parse_str($input, $requestData);
+                                }
                             } else {
                                 $requestData = [];
                             }
@@ -147,11 +157,10 @@ class Router
                         default:
                             $requestData = [];
                     }
-
+                    
                     $requestData = array_merge($requestData, $_FILES);
                     $response = $route['handler']($allParams, $requestData, self::sendResponse(200, 'ok'));
-                    
-                    return; // Exit after handling the matched route
+                    return;
                 }
             }
         }
